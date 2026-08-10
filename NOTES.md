@@ -151,3 +151,35 @@ Unbounded data sets like tags, varied nutritional information, photo metadata, a
 #### What performance considerations exists when using JSONB?
 
 While JSONB supports joins, they can be complex and potentially less performant compared to standard column joins. It's recommended to use JSONB for flexible data storage rather than for complex relational queries
+
+#### What does SQL GROUP BY clause do?
+
+GROUP BY is used to group rows that have the same values in specified columns, typically used with aggregation function like COUNT, AVG, MIN, or MAX.
+
+#### What rule must be followed when using SELECT with GROUP BY?
+
+Columns in the SELECT statement must also appear in the GROUP BY clause, or be used with an aggregation function.
+
+#### What are some common aggregation functions in SQL?
+
+COUNT(), AVG(), MIN, and MAX() which condense multiple values into a single summary value.
+
+#### What is the purpose of the HAVING clause in SQL?
+
+HAVING is used to filter results after aggregation, similar to a post-aggregation WHERE clause, allowing you to apply conditions to grouped data based on aggregate functions.
+
+#### What is the key difference between WHERE and HAVING in SQL?
+
+WHERE filters rows before aggregation, while HAVING filters rows after aggregation and grouping have been performed
+
+#### In what order do SQL clauses typically executes?
+
+The typical execution order is: FROM (identifies table) -> WHERE (filter rows) -> GROUP BY (groupeds data) -> Aggregation (COUNT< SUM etc.) -> HAVING (filters grouped results)
+
+#### How can you use WHERE and HAVING together in a SQL query?
+
+WHERE filters the intial dataset before aggregation, and HAVING further fitlers the aggregated results, allowing for multi-stage data filtering
+
+#### Why might you need to use HAVING instead of WHERE when working with aggregate functions?
+
+Because WHERE executes before aggregation, it cannot filter based on aggregate function results like COUNT(type), whereas HAVING can filter after the aggregation has been performed.

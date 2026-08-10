@@ -425,3 +425,24 @@ SELECT recipe_id, title, meta -> 'tags'
 FROM recipes
 WHERE meta -> 'tags' @> '"cake"';
 ```
+
+**Understanding Aggregation**
+
+```sql
+SELECT COUNT(*) FROM ingredients;
+SELECT COUNT(*) FROM recipes;
+SELECT COUNT(*) FROM recipes_photos;
+SELECT COUNT(*) FROM recipe_ingredients;
+
+SELECT COUNT(DISTINCT type) FROM ingredients;
+
+SELECT type, COUNT(type)
+FROM ingredients
+GROUP BY type;
+
+SELECT type, COUNT(type)
+FROM ingredients
+WHERE image IS NOT NULL
+GrOUP BY type
+HAVING COUNT(type) > 10;
+```
