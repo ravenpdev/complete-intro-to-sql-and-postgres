@@ -158,3 +158,22 @@ VALUES ('not real 1', 'delete.jpg', 'demo'), ('not real 2', 'delete.jpg', 'demo'
 DELETE FROM ingredients WHERE image = 'delete.jpg'
 RETURNING *;
 ```
+
+**Selecting, Paginating, & Using Where Clauses**
+
+```sql
+SELECT * FROM ingredients;
+SELECT title, type FROM ingredients;
+SELECT * FROM ingredients where type = 'vegetable';
+SELECT * FROM ingredients where type <> 'vegetable'; -- where type is not a fruit
+SELECT * FROM ingredients where id <= 10 OR id >= 20;
+SELECT * FROM ingredients where id >= 10 AND id <= 20 LIMIT 10;
+SELECT * FROM ingredients ORDER BY id LIMIT 10;
+SELECT * FROM ingredients ORDER BY id DESC LIMIT 10;
+SELECT * FROM ingredients ORDER BY title LIMIT 10;
+SELECT * FROM ingredients ORDER BY title DESC LIMIT 10;
+SELECT id, title, image FROM ingredients LIMIT 10;
+SELECT id, title, image FROM ingredients LIMIT 10 OFFSET 10;
+SELECT id, title, image FROM ingredients WHERE id > 23 LIMIT 10;
+
+```
