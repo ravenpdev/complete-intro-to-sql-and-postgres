@@ -177,3 +177,20 @@ SELECT id, title, image FROM ingredients LIMIT 10 OFFSET 10;
 SELECT id, title, image FROM ingredients WHERE id > 23 LIMIT 10;
 
 ```
+
+**Using LIKE, ILIKE, & SQL Functions**
+
+```sql
+SELECT * FROM ingredients WHERE title LIKE '%pota'; -- find where pota is at the end
+SELECT * FROM ingredients WHERE title LIKE 'pota%'; -- find where pota is at the start
+SELECT * FROM ingredients WHERE title LIKE '%pota%'; -- find from and or start
+SELECT * FROM ingredients WHERE title LIKE LOWER('%Pota%'); -- case insensitive
+SELECT * FROM ingredients WHERE title ILIKE '%Pota%'; -- case insensitive
+
+SELECT * FROM ingredients WHERE CONCAT(title, type) ILIKE '%fruit%';
+SELECT * FROM ingredients WHERE LOWER(CONCAT(title, type)) ILIKE '%fruit%';
+SELECT * FROM ingredients WHERE title ILIKE 'ch_rry'; -- match exactly one character
+
+SELECT NOW();
+SELECT LOWER('HI THERE');
+```
