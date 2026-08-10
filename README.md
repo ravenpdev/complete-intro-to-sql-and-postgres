@@ -88,6 +88,7 @@ ALTER TABLE ingredients ALTER COLUMN age TYPE integer;
 ALTER TABLE ingredients RENAME COLUMN name TO username;
 ALTER TABLE ingredients ALTER COLUMN status SET DEFAULT 'active';
 ALTER TABLE ingredients ALTER COLUMN username SET NOT NULL;
+ALERT TABLE ingredients ALTER COLUMN type DROP NOT NULL;
 ```
 
 **Inserting Data and Managing Conflicts**
@@ -135,4 +136,25 @@ INSERT INTO ingredients (title, image, value) VALUES ('watermelon', 'banana.jpg'
 INSERT INTO ingredients (title, image, value)
 VALUES ('watermelon', 'banana.jpg', 'this wont''t be updated')
 ON CONFLICT (title) DO UPDATE SET image = excluded.image;
+```
+
+**Updating & Deleting Data**
+
+```sql
+UPDATE ingredients SET image = 'watermelon.jpg'  WHERE title = 'watermelon';
+
+UPDATE ingredients SET image = 'watermelon.jpg' WHERE title = 'watermelon'
+RETURNING title, image, id, type;
+
+-- return everything using *
+UPDATE ingredients SET image = 'watermelon.jpg' WHERE title = 'watermelon'
+RETURNING *;
+
+-- insert sample data
+INSERT INTO ingredients (title, image, type)
+VALUES ('not real 1', 'delete.jpg', 'demo'), ('not real 2', 'delete.jpg', 'demo');
+
+-- delete multiple data
+DELETE FROM ingredients WHERE image = 'delete.jpg'
+RETURNING *;
 ```
