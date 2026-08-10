@@ -193,4 +193,198 @@ SELECT * FROM ingredients WHERE title ILIKE 'ch_rry'; -- match exactly one chara
 
 SELECT NOW();
 SELECT LOWER('HI THERE');
+
+-- window function
+SELECT *, COUNT(*) OVER ()::INT AS total_count FROM ingredients WHERE CONCAT(title, type) ILIKE '%fruit%' OFFSET 0 LIMIT 10;
+```
+
+**Understanding Relationships & Joins**
+
+```sql
+CREATE TABLE recipes (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    title VARCHAR(255) UNIQUE NOT NULL,
+    body TEXT
+);
+
+INSERT INTO recipes
+  (title, body)
+VALUES
+  ('cookies', 'very yummy'),
+  ('empanada','ugh so good'),
+  ('jollof rice', 'spectacular'),
+  ('shakshuka','absolutely wonderful'),
+  ('khachapuri', 'breakfast perfection'),
+  ('xiao long bao', 'god I want some dumplings right now');
+
+CREATE TABLE recipes_photos (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    recipe_id INTEGER, -- not a foreign key, just integer
+    url VARCHAR(255) NOT NULL
+);
+
+INSERT INTO recipes_photos
+  (recipe_id, url)
+VALUES
+  (1, 'cookies1.jpg'),
+  (1, 'cookies2.jpg'),
+  (1, 'cookies3.jpg'),
+  (1, 'cookies4.jpg'),
+  (1, 'cookies5.jpg'),
+  (2, 'empanada1.jpg'),
+  (2, 'empanada2.jpg'),
+  (3, 'jollof1.jpg'),
+  (4, 'shakshuka1.jpg'),
+  (4, 'shakshuka2.jpg'),
+  (4, 'shakshuka3.jpg'),
+  (5, 'khachapuri1.jpg'),
+  (5, 'khachapuri2.jpg');
+
+ -- WIHOUT ALIAS AND WHERE CLAUSE
+SELECT recipes.title, recipes.body, recipes_photos.url
+FROM recipes_photos
+INNER JOIN recipes
+ON recipes_photos.recipe_id = recipes.id
+WHERE recipes_photos.recipe_id = 4;
+
+-- INNER JOIN WITH ALIAS
+SELECT r.title, r.body, p.url
+FROM recipes_photos p
+INNER JOIN recipes r
+ON p.recipe_id = r.id;
+
+ -- INNER JOIN WITH ALIAS AND WHERE CLAUSE
+SELECT r.title, r.body, p.url
+FROM recipes_photos p
+INNER JOIN recipes r
+ON p.recipe_id = r.id
+WHERE p.recipe_id =4;
+
+-- RIGHT OUTER JOIN
+SELECT r.title, r.body, p.url
+FROM recipes_photos p
+RIGHT OUTER JOIN recipes r
+ON p.recipe_id = r.id;
+
+-- LEFT OUTER JOIN
+SELECT r.title, r.body, p.url
+FROM recipes_photos p
+LEFT OUTER JOIN recipes r
+ON p.recipe_id = r.id;
+
+-- FULL OUTER JOIN
+SELECT r.title, r.body, p.url
+FROM recipes_photos p
+FULL OUTER JOIN recipes r
+ON p.recipe_id = r.id;
+
+-- NATURAL JOIN
+-- Natural Join automatically joins tables based on columns with the same name.
+SELECT * FROM recipes_photos NATURAL JOIN recipes;
+
+-- CROSS JOIN
+-- get all permutation
+SELECT r.title, r.body, rp.url
+FROM recipes_photos rp
+CROSS JOIN recipes r;
+```
+
+**Foreign Keys & Managing References**
+
+```sql
+DELETE
+FROM recipes r
+WHERE r.id = 5;
+
+SELECT *
+FROM recipes_photos rp
+WHERE rp.recipe_id = 5;
+
+-- reset table
+DROP TABLE IF EXISTS recipes;
+DROP TABLE IF EXISTS recipes_photos;
+CREATE TABLE recipes (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    title VARCHAR(255) UNIQUE NOT NULL,
+    body TEXT
+);
+
+INSERT INTO recipes (title, body)
+VALUES
+    ('cookies', 'very yummy'),
+    ('empanada','ugh so good'),
+    ('jollof rice', 'spectacular'),
+    ('shakshuka','absolutely wonderful'),
+    ('khachapuri', 'breakfast perfection'),
+    ('xiao long bao', 'god I want some dumplings right now');
+
+CREATE TABLE recipes_photos (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    url VARCHAR(255) NOT NULL,
+    recipe_id INTEGER REFERENCES recipes(id) ON DELETE CASCADE
+);
+```
+
+**Many-to-Many Relationships**
+
+```sql
+CREATE TABLE recipe_ingredients(
+    recipe_id INTEGER REFERENCES recipes(id) ON DELETE NO ACTION,
+    ingredient_id INTEGER REFERENCES ingredients(id) ON DELETE NO ACTION,
+    CONSTRAINT recipe_ingredients_pk PRIMARY KEY (recipe_id, ingredient_id)
+);
+
+INSERT INTO recipe_ingredients
+  (recipe_id, ingredient_id)
+VALUES
+  (1, 10),
+  (1, 11),
+  (1, 13),
+  (2, 5),
+  (2, 13);
+
+SELECT
+    i.title AS ingredient_title,
+    i.image AS ingredient_image,
+    i.type AS ingredient_type,
+    r.title AS recipe_title,
+    r.body AS recipe_body
+FROM recipe_ingredients ri
+INNER JOIN ingredients i
+ON i.id = ri.ingredient_id
+INNER JOIN recipes r
+ON r.id = ri.recipe_id;
+-- WHERE ri.recipe_id = 1;
+```
+
+**Using the CHECK Constraint**
+
+```sql
+ALTER TABLE ingredients
+ADD CONSTRAINT type_check_enums -- type_check_enums is the name of the constraint
+CHECK
+    (type IN ('meat', 'fruit', 'vegetable', 'other'));
+
+INSERT INTO ingredients (title, image, type)
+VALUES ('lol', 'wat.svg', 'obviously not a type');
+```
+
+**Using the DISTINCT Statement**
+
+```sql
+SELECT DISTINCT ON (recipe_id) * FROM recipe_ingredients;
+
+SELECT DISTINCT type FROM ingredients;
+
+SELECT DISTINCT ON (r.id) *
+FROM recipes r
+LEFT JOIN recipes_photos rp
+ON r.id = rp.recipe_id;
+
+SELECT DISTINCT ON (r.recipe_id)
+    r.title,
+    COALESCE (rp.url, 'default.jpg') AS url -- coalesce if rp.url is null or null like show default.jpg else return rp.url value
+FROM recipes r
+LEFT JOIN recipes_photos rp
+ON r.recipe_id = rp.recipe_id;
 ```
