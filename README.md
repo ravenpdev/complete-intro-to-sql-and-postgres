@@ -68,3 +68,20 @@ DROP table ingredients;
 ```sql
 SELECT * from ingredients;
 ```
+
+**Alerting a table**
+
+```sql
+ALTER TABLE ingredients ADD COLUMN image VARCHAR(255);
+
+ALTER TABLE ingredients DROP COLUMN image VARCHAR(255);
+
+ALTER TABLE ingredients
+ADD COLUMN image VARCHAR(255),
+ADD COLUMN type VARCHAR(50) NOT NULL;
+
+ALTER TABLE ingredients ALTER COLUMN age TYPE integer;
+ALTER TABLE ingredients RENAME COLUMN name TO username;
+ALTER TABLE ingredients ALTER COLUMN status SET DEFAULT 'active';
+ALTER TABLE ingredients ALTER COLUMN username SET NOT NULL;
+```
