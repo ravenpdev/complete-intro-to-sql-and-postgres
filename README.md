@@ -446,3 +446,96 @@ WHERE image IS NOT NULL
 GrOUP BY type
 HAVING COUNT(type) > 10;
 ```
+
+**Functions Triggers and Procedures**
+
+```sql
+SELECT r.title
+FROM recipe_ingredients ri
+INNER JOIN recipes r
+ON r.recipe_id = ri.recipe_id
+GROUP BY r.title
+HAVING COUNT(r.title) BETWEEN 4 and 6;
+
+CREATE OR REPLACE FUNCTION
+  get_recipes_with_ingredients(low INT, high INT)
+RETURNS
+  SETOF VARCHAR
+LANGUAGE
+  plpgsql
+AS
+$$
+BEGIN
+  RETURN QUERY SELECT
+    r.title
+  FROM
+    recipe_ingredients ri
+
+  INNER JOIN
+    recipes r
+  ON
+    r.recipe_id = ri.recipe_id
+
+  GROUP BY
+    r.title
+  HAVING
+    COUNT(r.title) between low and high;
+END;
+$$;
+
+-- Procedures
+SELECT * FROM ingredients WHERE image IS NULL;
+INSERT INTO ingredients (title, type) VAlUES ('venison', 'meat');
+
+CREATE PROCEDURE
+  set_null_ingredient_images_to_default()
+LANGUAGE
+  SQL
+AS
+$$
+  UPDATE
+    ingredients
+  SET
+    image = 'default.jpg'
+  WHERE
+    image IS NULL;
+$$;
+
+CALL set_null_ingredient_images_to_default();
+SELECT * FROM ingredients WHERE image IS NULL;
+
+-- triggers
+CREATE TABLE updated_recipes (
+    id INT GENERATED ALWAYS AS IDENTITY,
+    recipe_id INT,
+    old_title VARCHAR(255),
+    new_title VARCHAR(255),
+    time_of_update TIMESTAMP
+);
+
+CREATE OR REPLACE FUNCTION log_updated_recipe_name()
+    RETURNS
+        TRIGGER
+    LANGUAGE
+        plpgsql
+AS
+$$
+BEGIN
+    IF OLD.title <> NEW.title THEN
+        INSERT INTO
+            updated_recipes (recipe_id, old_title, new_title, time_of_update)
+        VALUES
+            (NEW.recipe_id, OLD.title, NEW.title, NOW());
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE TRIGGER update_recipe_trigger
+AFTER UPDATE ON recipes
+FOR EACH ROW EXECUTE PROCEDURE log_updated_recipe_name();
+
+-- You can do this on inserts, deletes, and all sorts of other events. We're also runnign this after the insert happens. If you wanted to prevent certain updates or modify them, you could run this before as well.
+
+-- NOTE: you can't run prodcedures as triggers. Triggers always deal with functions. However there's nothng preventing you from calling a procedure from a function.
+```
