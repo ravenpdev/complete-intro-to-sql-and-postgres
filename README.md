@@ -53,7 +53,11 @@ CREATE TABLE ingredients (
 **Inserting data into a table**
 
 ```sql
-INSERT INTO ingredients (title) VALUES ('bell pepper')
+INSERT INTO ingredients (title) VALUES ('bell pepper');
+
+INSERT INTO ingredients (title, image, type) -- comment
+VALUES('red pepper', 'red_pepper.jpg', 'vegetable');
+
 ```
 
 **Dropping a database and table**
@@ -84,4 +88,51 @@ ALTER TABLE ingredients ALTER COLUMN age TYPE integer;
 ALTER TABLE ingredients RENAME COLUMN name TO username;
 ALTER TABLE ingredients ALTER COLUMN status SET DEFAULT 'active';
 ALTER TABLE ingredients ALTER COLUMN username SET NOT NULL;
+```
+
+**Inserting Data and Managing Conflicts**
+
+```sql
+INSERT INTO ingredients (
+  title, image, type
+) VALUES
+  ( 'avocado', 'avocado.jpg', 'fruit' ),
+  ( 'banana', 'banana.jpg', 'fruit' ),
+  ( 'beef', 'beef.jpg', 'meat' ),
+  ( 'black_pepper', 'black_pepper.jpg', 'other' ),
+  ( 'blueberry', 'blueberry.jpg', 'fruit' ),
+  ( 'broccoli', 'broccoli.jpg', 'vegetable' ),
+  ( 'carrot', 'carrot.jpg', 'vegetable' ),
+  ( 'cauliflower', 'cauliflower.jpg', 'vegetable' ),
+  ( 'cherry', 'cherry.jpg', 'fruit' ),
+  ( 'chicken', 'chicken.jpg', 'meat' ),
+  ( 'corn', 'corn.jpg', 'vegetable' ),
+  ( 'cucumber', 'cucumber.jpg', 'vegetable' ),
+  ( 'eggplant', 'eggplant.jpg', 'vegetable' ),
+  ( 'fish', 'fish.jpg', 'meat' ),
+  ( 'flour', 'flour.jpg', 'other' ),
+  ( 'ginger', 'ginger.jpg', 'other' ),
+  ( 'green_bean', 'green_bean.jpg', 'vegetable' ),
+  ( 'onion', 'onion.jpg', 'vegetable' ),
+  ( 'orange', 'orange.jpg', 'fruit' ),
+  ( 'pineapple', 'pineapple.jpg', 'fruit' ),
+  ( 'potato', 'potato.jpg', 'vegetable' ),
+  ( 'pumpkin', 'pumpkin.jpg', 'vegetable' ),
+  ( 'raspberry', 'raspberry.jpg', 'fruit' ),
+  ( 'red_pepper', 'red_pepper.jpg', 'vegetable' ),
+  ( 'salt', 'salt.jpg', 'other' ),
+  ( 'spinach', 'spinach.jpg', 'vegetable' ),
+  ( 'strawberry', 'strawberry.jpg', 'fruit' ),
+  ( 'sugar', 'sugar.jpg', 'other' ),
+  ( 'tomato', 'tomato.jpg', 'vegetable' ),
+  ( 'watermelon', 'watermelon.jpg', 'fruit' )
+ON CONFLICT DO NOTHING;
+
+INSERT INTO ingredients (title, image, value) VALUES ('watermelon', 'banana.jpg', 'this wont''t be updated') ON CONFLICT DO NOTHING;
+
+-- upsert
+-- update the image value when there is a conflict with title
+INSERT INTO ingredients (title, image, value)
+VALUES ('watermelon', 'banana.jpg', 'this wont''t be updated')
+ON CONFLICT (title) DO UPDATE SET image = excluded.image;
 ```
