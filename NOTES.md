@@ -111,3 +111,43 @@ Use the COUNT() function followed by FROM and the table name, such as 'SELECT CO
 #### What does ON (column_name) do when used with DISTINCT?
 
 When used with DISTINCT, ON (column_name) ensures that only one row per unique value of that column is returned, effectively limiting the result to the first occurence of each distinct value
+
+#### JSON vs JSONB
+
+For almost everything we're going to show here you could use either. If you want a one liner; always use JSONB, in almost every case it's better. The JSON datatype is a text field that validates it's valid JSON, and that's it. It doesn't do any compression, doesn't validate any of the interior values datatypes, and a frew other benefirst. The B in JSON B literally stands for "better".
+
+- JSONB - in most cases
+- JSON - if you're just processing logs, don't often need to query, and use as more of an audit trail
+- hstore - Can work fine for text based key-value looks, but in general JSONB can still work great here
+
+#### What are the key differences between JSON and JSONB data types in PostgreSQL?
+
+JSONB (the 'B' stands for 'better') is optimized for both storage space and query speed, making it faster to query than JSON. JSONB drops insignificant whitespace and processes data during storage. JSON preserves whitespace and is faster to store with no processing, but is slower to query. In practice, JSONB should almost always be used over JSON except in rare cases like logging where writes are frequent and reads are infrequent.
+
+#### When would you still recommend using a separate table for relationships instead of JSONB?
+
+For many-to-many relationships, such as ingredients to recipes, it is still recommened to use intermediary tables rather than modeling the relationship in JSONB. However, for one-to-many relationships (like recipse to photos), JSONB is now often preferred over separate tables since it's easier to deal with and doesn't require joins.
+
+#### What unique capability does PostgreSQL's JSONB data type provide compared to traditional relational database storage?
+
+JSONB allows storing JSON data and enables querying directly into the JSON structure within the column, providing flexibility for unstructured or semi-structured data
+
+#### What is a good use case for using JSONB in Postgres?
+
+JSONB is ideal for heterogeneous information, unbounded data like tags, one-to-many relationships, and scenarios where not every row has the same structure data (such as varied nutritional information)
+
+#### When should you create a regular column instead of using JSONB?
+
+When every single row has the data, when you need to enforce constraint like NOT NULL or uniquness, and when you want to perform standard joins easily
+
+#### What are some key advantages of using JSONB in Postgres?
+
+JSONB allow storing document-like data within a relational database, supports flexible schema, enables storing heterogeneous information, and maintains the power of relational database features like joins
+
+#### What type of data structures work well with JSONB columns?
+
+Unbounded data sets like tags, varied nutritional information, photo metadata, and other flexible, non-uniform data that doesn't require strict schema enforcement
+
+#### What performance considerations exists when using JSONB?
+
+While JSONB supports joins, they can be complex and potentially less performant compared to standard column joins. It's recommended to use JSONB for flexible data storage rather than for complex relational queries

@@ -388,3 +388,40 @@ FROM recipes r
 LEFT JOIN recipes_photos rp
 ON r.recipe_id = rp.recipe_id;
 ```
+
+```bash
+docker run -e POSTGRES_PASSWORD=lol --name=sql -p 5432:5432 -d --rm btholt/complete-intro-to-sql
+```
+
+**JSONB**
+
+```sql
+ALTER TABlE recipes
+ADD COLUMN meta JSONB;
+
+UPDATE recipes
+SET meta = '{"tags": ["chocolate", "desert", "cake"] }'
+WHERE recipe_id = 16;
+
+SELECT meta FROM recipes WHERE meta IS NOT NULL;
+SELECT meta -> 'tags' FROM recipes WHERE meta IS NOT NULL;
+SELECT meta -> 'tags' -> 0 FROM recipes WHERE meta IS NOT NULL;
+SELECT meta -> 'tags' -> 1 FROM recipes WHERE meta IS NOT NULL;
+SELECT meta -> 'tags' -> 0 AS first_tag FROM recipes WHERE meta IS NOT NULL;
+-- ->> double greater than return value as plain string text
+SELECT meta -> 'tags' ->> 0 AS first_tag FROM recipes WHERE meta IS NOT NULL;
+
+-- ? do you contain top level key
+SELECT recipe_id, title, meta -> 'tags'
+FROM recipes
+WHERE meta -> 'tags' ? 'cake';
+
+SELECT recipe_id, title, meta -> 'tags'
+FROM recipes
+WHERE meta ? 'tags';
+
+-- @> does this array contains this value
+SELECT recipe_id, title, meta -> 'tags'
+FROM recipes
+WHERE meta -> 'tags' @> '"cake"';
+```
